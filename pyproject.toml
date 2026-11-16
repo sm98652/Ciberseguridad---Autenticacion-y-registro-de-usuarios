@@ -1,0 +1,30 @@
+[project]
+name = "web-app"
+version = "0.1.0"
+description = "App Streamlit con registro, autenticación y 2FA (TOTP)"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "argon2-cffi>=23.1.0",
+    "cryptography>=43.0.0",
+    "psycopg[binary]>=3.2.10",
+    "pyotp>=2.9.0",
+    "qrcode[pil]>=8.0",
+    "requests==2.33.0",
+    "streamlit>=1.66.1",
+]
+
+[project.scripts]
+web-app = "web_app:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
