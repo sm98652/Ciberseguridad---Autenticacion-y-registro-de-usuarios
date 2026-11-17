@@ -64,6 +64,12 @@ class FakeRepo:
                  and (last_ok is None or a["at"] > last_ok)]
         return sorted(fails, reverse=True)[:limit]
 
+    def get_stored_data(self, user_id):
+        u = next((u for u in self.users.values() if u["id"] == user_id and u["otp_confirmed"]), None)
+        if u is None:
+            return None
+        return StoredUserData(u["email"], u["created_at"], u["pii_enc"], u["phi_enc"], u["credit_enc"])
+
     def list_confirmed_users(self):
         confirmed = sorted(
             (u for u in self.users.values() if u["otp_confirmed"]), key=lambda u: u["created_at"]
