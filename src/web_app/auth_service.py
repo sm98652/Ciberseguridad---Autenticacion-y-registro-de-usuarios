@@ -16,6 +16,7 @@ from typing import Callable
 
 from . import otp
 from .config import Settings
+from .export import users_to_csv
 from .repository import EmailAlreadyRegistered, UserRepository
 from .security import (
     DUMMY_HASH,
@@ -93,7 +94,6 @@ class AuthService:
         self._s = settings
         self._clock = clock
 
-    # ------------------------------------------------------------- registro
 
     def register(self, form: RegistrationForm) -> RegistrationResult:
         email = normalize_email(form.email)
@@ -155,7 +155,6 @@ class AuthService:
         self._repo.record_attempt(email, True, "enrollment_ok")
         return AuthResult(AuthStatus.OK, user_id=user.id, email=email)
 
-    # ---------------------------------------------------------------- login
 
     def authenticate(self, email: str, password: str, code: str) -> AuthResult:
         email = normalize_email(email)
@@ -196,7 +195,24 @@ class AuthService:
         self._repo.record_attempt(email, True, "ok")
         return AuthResult(AuthStatus.OK, user_id=user.id, email=email)
 
-    # ----------------------------------------------------------- internos
+
+    def export_users_csv(self, requested_by: str) -> bytes:
+        """CSV con los datos descifrados de las cuentas confirmadas. Solo administradores.
+
+        El permiso se valida aquí además de en la página, para que ninguna otra
+        pantalla pueda llamar esta función y saltarse el control.
+        """
+        if normalize_email(requested_by) not in self._s.admin_emails:
+            raise PermissionError("Solo un administrador puede exportar los usuarios.")
+        rows = []
+        for user in self._repo.list_confirmed_users():
+            row: dict[str, object] = {}
+            for blob in (user.pii_enc, user.phi_enc, user.credit_enc):
+                row.update(self._cipher.decrypt_json(blob))
+            row["email"] = user.email
+            row["created_at"] = user.created_at.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M")
+            rows.append(row)
+        return users_to_csv(rows)
 
     def _lock_remaining(self, email: str, now: float) -> int:
         """Segundos que faltan para poder reintentar (0 si no está bloqueado)."""
