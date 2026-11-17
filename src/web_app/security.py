@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import secrets
 from typing import Any
@@ -68,7 +69,8 @@ def needs_rehash(password_hash: str) -> bool:
 # Hash/secreto "señuelo": se verifican cuando el usuario no existe para que la
 # respuesta tarde lo mismo y no se pueda enumerar correos por tiempo de respuesta.
 DUMMY_HASH = _hasher.hash(secrets.token_urlsafe(24))
-DUMMY_OTP_SECRET = "JBSWY3DPEHPK3PXP"
+# 160 bits, como un secreto real: pyotp rechaza secretos de menos de 112 bits.
+DUMMY_OTP_SECRET = base64.b32encode(secrets.token_bytes(20)).decode()
 
 
 class FieldCipher:
