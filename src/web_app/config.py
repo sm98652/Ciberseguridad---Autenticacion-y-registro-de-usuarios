@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 class Settings:
     database_url: str
     encryption_keys: str
-    issuer: str = "Today"
+    issuer: str = "Nuu"
     max_failed_attempts: int = 5
     lockout_minutes: int = 15
     admin_emails: frozenset[str] = field(default_factory=frozenset)
@@ -29,8 +29,9 @@ def get_settings() -> Settings:
     return Settings(
         database_url=os.environ["DATABASE_URL"],
         encryption_keys=os.environ["APP_ENCRYPTION_KEY"],
-        issuer=os.environ.get("APP_ISSUER", "Today"),
+        issuer=os.environ.get("APP_ISSUER", "Nuu"),
         max_failed_attempts=int(os.environ.get("MAX_FAILED_ATTEMPTS", "5")),
         lockout_minutes=int(os.environ.get("LOCKOUT_MINUTES", "15")),
         admin_emails=_parse_emails(os.environ.get("ADMIN_EMAILS", "")),
+    )et("ADMIN_EMAILS", "")),
     )
