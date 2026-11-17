@@ -17,7 +17,7 @@ from typing import Callable
 from . import otp
 from .config import Settings
 from .export import users_to_csv
-from .repository import EmailAlreadyRegistered, UserRepository
+from .repository import EmailAlreadyRegistered, StoredUserData, UserRepository
 from .security import (
     DUMMY_HASH,
     DUMMY_OTP_SECRET,
@@ -196,6 +196,14 @@ class AuthService:
         return AuthResult(AuthStatus.OK, user_id=user.id, email=email)
 
 
+    def get_account(self, user_id: int) -> dict[str, object] | None:
+        """Datos descifrados de la propia cuenta. El user_id sale de la sesión del
+        servidor, no de algo que el usuario envíe, así que nadie puede pedir otra cuenta."""
+        stored = self._repo.get_stored_data(user_id)
+        if stored is None:
+            return None
+        return self._decrypt_row(stored)
+
     def export_users_csv(self, requested_by: str) -> bytes:
         """CSV con los datos descifrados de las cuentas confirmadas. Solo administradores.
 
@@ -204,15 +212,15 @@ class AuthService:
         """
         if normalize_email(requested_by) not in self._s.admin_emails:
             raise PermissionError("Solo un administrador puede exportar los usuarios.")
-        rows = []
-        for user in self._repo.list_confirmed_users():
-            row: dict[str, object] = {}
-            for blob in (user.pii_enc, user.phi_enc, user.credit_enc):
-                row.update(self._cipher.decrypt_json(blob))
-            row["email"] = user.email
-            row["created_at"] = user.created_at.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M")
-            rows.append(row)
-        return users_to_csv(rows)
+        return users_to_csv([self._decrypt_row(u) for u in self._repo.list_confirmed_users()])
+
+    def _decrypt_row(self, user: StoredUserData) -> dict[str, object]:
+        row: dict[str, object] = {}
+        for blob in (user.pii_enc, user.phi_enc, user.credit_enc):
+            row.update(self._cipher.decrypt_json(blob))
+        row["email"] = user.email
+        row["created_at"] = user.created_at.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M")
+        return row
 
     def _lock_remaining(self, email: str, now: float) -> int:
         """Segundos que faltan para poder reintentar (0 si no está bloqueado)."""
