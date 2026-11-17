@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
@@ -13,6 +13,11 @@ class Settings:
     issuer: str = "Today"
     max_failed_attempts: int = 5
     lockout_minutes: int = 15
+    admin_emails: frozenset[str] = field(default_factory=frozenset)
+
+
+def _parse_emails(raw: str) -> frozenset[str]:
+    return frozenset(e.strip().lower() for e in raw.split(",") if e.strip())
 
 
 def get_settings() -> Settings:
@@ -27,4 +32,5 @@ def get_settings() -> Settings:
         issuer=os.environ.get("APP_ISSUER", "Today"),
         max_failed_attempts=int(os.environ.get("MAX_FAILED_ATTEMPTS", "5")),
         lockout_minutes=int(os.environ.get("LOCKOUT_MINUTES", "15")),
+        admin_emails=_parse_emails(os.environ.get("ADMIN_EMAILS", "")),
     )
