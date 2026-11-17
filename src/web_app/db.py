@@ -110,6 +110,16 @@ class PostgresUserRepository:
         with psycopg.connect(self._dsn) as conn:
             return [r[0] for r in conn.execute(sql, (email, since, email, limit)).fetchall()]
 
+    def get_stored_data(self, user_id: int) -> StoredUserData | None:
+        sql = """
+            SELECT email, created_at, pii_enc, phi_enc, credit_enc
+            FROM users
+            WHERE id = %s AND otp_confirmed = TRUE
+        """
+        with psycopg.connect(self._dsn) as conn:
+            row = conn.execute(sql, (user_id,)).fetchone()
+        return StoredUserData(*row) if row else None
+
     def list_confirmed_users(self) -> list[StoredUserData]:
         sql = """
             SELECT email, created_at, pii_enc, phi_enc, credit_enc
