@@ -33,5 +33,4 @@ def get_settings() -> Settings:
         max_failed_attempts=int(os.environ.get("MAX_FAILED_ATTEMPTS", "5")),
         lockout_minutes=int(os.environ.get("LOCKOUT_MINUTES", "15")),
         admin_emails=_parse_emails(os.environ.get("ADMIN_EMAILS", "")),
-    )et("ADMIN_EMAILS", "")),
     )
