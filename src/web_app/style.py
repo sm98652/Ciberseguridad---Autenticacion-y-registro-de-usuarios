@@ -88,6 +88,20 @@ h1, h2, h3, h4 { font-weight: 300 !important; letter-spacing: 0.02em; }
 }
 .section-title:first-child { margin-top: 0; }
 .section-note { font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-bottom: 0.4rem; }
+.hero-title {
+    text-align: center; font-size: 2.6rem !important; font-weight: 300 !important;
+    color: #FFFFFF; margin: 2.5rem 0 0.6rem 0;
+}
+.hero-lead {
+    text-align: center; color: rgba(255,255,255,0.8); max-width: 440px;
+    margin: 0 auto 2.5rem auto; line-height: 1.6;
+}
+.st-key-features { border-top: 1px solid rgba(255,255,255,0.35); padding-top: 1.4rem; margin-bottom: 1.6rem; }
+.st-key-cta button {
+    background: #2B1913; border: none; color: #FFFFFF;
+    letter-spacing: 0.25em; text-transform: uppercase; font-size: 0.78rem; padding: 0.75rem 0;
+}
+.st-key-cta button:hover { background: #3D251C; color: #FFFFFF; }
 .footer {
     text-align: center; color: rgba(255,255,255,0.6); font-size: 0.72rem;
     letter-spacing: 0.08em; margin-top: 2.5rem;
@@ -125,8 +139,3 @@ def footer() -> None:
         f"<p class='footer'>© {date.today().year} Nuu · Todos los derechos reservados</p>",
         unsafe_allow_html=True,
     )
-    st.markdown(CSS, unsafe_allow_html=True)
-
-
-def avatar() -> None:
-    st.markdown(AVATAR, unsafe_allow_html=True)
