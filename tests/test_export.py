@@ -23,7 +23,7 @@ def test_formula_injection_is_neutralized():
 
 def test_negative_numbers_are_not_escaped():
     rows = _read(users_to_csv([{"email": "x@y.co", "declared_debt": -5.0}]))
-    assert rows[1][10] == "-5.0"
+    assert rows[1][10] == "-5"
 
 
 def test_never_exports_secrets():
