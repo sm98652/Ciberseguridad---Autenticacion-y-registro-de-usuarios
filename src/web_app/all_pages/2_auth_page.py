@@ -14,9 +14,6 @@ from web_app.auth_service import (
 from web_app import style
 from web_app.session import current_user, get_service, login_user, logout
 
-st.set_page_config(page_title="Acceso", layout="centered")
-style.apply()
-
 service = get_service()
 
 
@@ -36,20 +33,6 @@ def lock_message(seconds: int) -> str:
     return f"Demasiados intentos fallidos. Intenta de nuevo en {minutes} min."
 
 
-def section(title: str, note: str) -> None:
-    st.markdown(
-        f"<p class='section-title'>{title}</p><p class='section-note'>{note}</p>",
-        unsafe_allow_html=True,
-    )
-
-
-def footer() -> None:
-    st.markdown(
-        f"<p class='footer'>© {date.today().year} Nuu · Todos los derechos reservados</p>",
-        unsafe_allow_html=True,
-    )
-
-
 st.markdown("<p class='brand'>Nuu · acceso seguro</p>", unsafe_allow_html=True)
 
 user = current_user()
@@ -66,7 +49,7 @@ if user:
             if st.form_submit_button("Cerrar sesión", width="stretch"):
                 logout()
                 st.rerun()
-    footer()
+    style.footer()
     st.stop()
 
 tab_login, tab_register = st.tabs(["Iniciar sesión", "Crear cuenta"])
@@ -104,7 +87,7 @@ with tab_register:
     pending = st.session_state.get("pending_enrollment")
 
     if pending:
-        section(
+        style.section(
             "Activa la verificación en dos pasos",
             "Tu cuenta queda pendiente hasta que confirmes el primer código.",
         )
@@ -136,7 +119,7 @@ with tab_register:
                 st.error("Código incorrecto. Intenta de nuevo.")
     else:
         with st.form("register"):
-            section(
+            style.section(
                 "Cuenta",
                 "Se guarda solo como hash Argon2id, nadie puede leerla.",
             )
@@ -149,7 +132,7 @@ with tab_register:
             )
             r_pass2 = c2.text_input("Confirmar contraseña", type="password")
 
-            section("Datos personales · PII", "Se almacenan cifrados.")
+            style.section("Datos personales · PII", "Se almacenan cifrados.")
             full_name = st.text_input("Nombre completo")
             c1, c2 = st.columns(2)
             document_id = c1.text_input("Documento de identidad")
@@ -164,13 +147,13 @@ with tab_register:
             phone = c1.text_input("Teléfono")
             address = c2.text_input("Dirección")
 
-            section("Datos de salud · PHI", "Se almacenan cifrados.")
+            style.section("Datos de salud · PHI", "Se almacenan cifrados.")
             blood_type = st.selectbox("Tipo de sangre", BLOOD_TYPES)
             medical_conditions = st.text_area(
                 "Condiciones médicas o alergias", placeholder="Opcional", height=90
             )
 
-            section("Información financiera", "Se almacena cifrada. No pedimos números de tarjeta.")
+            style.section("Información financiera", "Se almacena cifrada. No pedimos números de tarjeta.")
             c1, c2, c3 = st.columns(3)
             monthly_income = c1.number_input(
                 "Ingresos mensuales (COP)", min_value=0.0, step=100000.0, format="%.0f"
@@ -216,4 +199,4 @@ with tab_register:
                 }
                 st.rerun()
 
-footer()
+style.footer()
