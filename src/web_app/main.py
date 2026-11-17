@@ -14,6 +14,9 @@ all_pages = [
     st.Page("all_pages/5_C_page.py", title="Equipo Chat"),
 ]
 
+if current_user():
+    all_pages.insert(2, st.Page("all_pages/7_account_page.py", title="Mi cuenta"))
+
 # La página solo se muestra en el menú a los administradores. Esto es comodidad,
 # no seguridad: la página y el servicio vuelven a verificar el permiso.
 if is_admin(current_user()):
@@ -23,6 +26,10 @@ if is_admin(current_user()):
 def main() -> None:
     pg = st.navigation(all_pages)
     pg.run()
+
+
+if __name__ == "__main__":
+    main()
 
 
 if __name__ == "__main__":
