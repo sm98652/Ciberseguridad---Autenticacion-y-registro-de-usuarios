@@ -1,3 +1,5 @@
+import csv
+import io
 import itertools
 import unittest
 from datetime import date
@@ -43,7 +45,10 @@ class AuthServiceBase(unittest.TestCase):
     def setUp(self):
         self.clock = Clock()
         self.repo = FakeRepo(self.clock)
-        self.settings = Settings(database_url="x", encryption_keys="x", max_failed_attempts=5, lockout_minutes=15)
+        self.settings = Settings(
+            database_url="x", encryption_keys="x", max_failed_attempts=5, lockout_minutes=15,
+            admin_emails=frozenset({"admin@mail.com"}),
+        )
         self.cipher = FieldCipher(Fernet.generate_key().decode())
         self.svc = AuthService(self.repo, self.cipher, self.settings, clock=self.clock)
 
@@ -203,3 +208,37 @@ class RateLimitTest(AuthServiceBase):
             self.svc.confirm_enrollment(EMAIL, "000000")
         res = self.svc.confirm_enrollment(EMAIL, self.code(reg.otp_secret))
         self.assertIs(res.status, AuthStatus.LOCKED)
+
+class ExportTest(AuthServiceBase):
+    def rows(self, data: bytes):
+        return list(csv.DictReader(io.StringIO(data.decode("utf-8-sig"))))
+
+    def test_admin_gets_decrypted_data_of_confirmed_users(self):
+        self.register_active()
+        rows = self.rows(self.svc.export_users_csv("admin@mail.com"))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["Correo"], EMAIL)
+        self.assertEqual(rows[0]["Documento"], "1020304050")
+        self.assertEqual(rows[0]["Condiciones médicas"], "Alergia a la penicilina")
+        self.assertEqual(rows[0]["Puntaje crediticio"], "720")
+
+    def test_non_admin_cannot_export(self):
+        self.register_active()
+        for requester in [EMAIL, "", "otro@mail.com"]:
+            with self.assertRaises(PermissionError, msg=requester):
+                self.svc.export_users_csv(requester)
+
+    def test_admin_check_ignores_case_and_spaces(self):
+        self.register_active()
+        self.assertTrue(self.svc.export_users_csv("  Admin@Mail.com "))
+
+    def test_pending_accounts_are_not_exported(self):
+        self.svc.register(make_form())
+        self.assertEqual(self.rows(self.svc.export_users_csv("admin@mail.com")), [])
+
+    def test_password_hash_and_otp_secret_never_exported(self):
+        secret = self.register_active()
+        data = self.svc.export_users_csv("admin@mail.com").decode("utf-8-sig")
+        self.assertNotIn("argon2", data)
+        self.assertNotIn(secret, data)
+        self.assertNotIn(PASSWORD, data)
