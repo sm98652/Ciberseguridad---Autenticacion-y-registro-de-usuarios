@@ -21,6 +21,17 @@ class User:
     otp_last_step: int
 
 
+@dataclass(frozen=True)
+class StoredUserData:
+    """Datos de un usuario tal como están guardados (cifrados), para exportar."""
+
+    email: str
+    created_at: datetime
+    pii_enc: str
+    phi_enc: str
+    credit_enc: str
+
+
 class UserRepository(Protocol):
     def create_user(
         self,
@@ -49,3 +60,7 @@ class UserRepository(Protocol):
 
     def recent_failures(self, email: str, since: datetime, limit: int) -> list[datetime]:
         """Fallos posteriores a `since` y al último éxito, del más nuevo al más antiguo."""
+
+    def list_confirmed_users(self) -> list[StoredUserData]:
+        """Usuarios con el OTP confirmado, ordenados por fecha de registro.
+        No incluye el hash de la contraseña ni el secreto OTP."""
