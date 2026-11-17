@@ -69,3 +69,7 @@ def require_admin() -> dict:
         st.error("No tienes permisos para ver esta sección.")
         st.stop()
     return user
+    if not is_admin(user):
+        st.error("No tienes permisos para ver esta sección.")
+        st.stop()
+    return user
