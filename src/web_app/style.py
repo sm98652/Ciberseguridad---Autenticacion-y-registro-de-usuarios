@@ -1,3 +1,5 @@
+from datetime import date
+
 import streamlit as st
 
 CSS = """
@@ -28,7 +30,7 @@ h1, h2, h3, h4 { font-weight: 300 !important; letter-spacing: 0.02em; }
     font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase;
 }
 
-[data-testid="stForm"], .st-key-enroll-card {
+[data-testid="stForm"], .st-key-enroll-card, .st-key-admin-card {
     background: rgba(255, 255, 255, 0.07);
     border: 1px solid rgba(255, 255, 255, 0.45) !important;
     backdrop-filter: blur(6px);
@@ -104,6 +106,25 @@ AVATAR = """
 
 
 def apply() -> None:
+    st.markdown(CSS, unsafe_allow_html=True)
+
+
+def avatar() -> None:
+    st.markdown(AVATAR, unsafe_allow_html=True)
+
+
+def section(title: str, note: str) -> None:
+    st.markdown(
+        f"<p class='section-title'>{title}</p><p class='section-note'>{note}</p>",
+        unsafe_allow_html=True,
+    )
+
+
+def footer() -> None:
+    st.markdown(
+        f"<p class='footer'>© {date.today().year} Nuu · Todos los derechos reservados</p>",
+        unsafe_allow_html=True,
+    )
     st.markdown(CSS, unsafe_allow_html=True)
 
 
