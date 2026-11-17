@@ -10,7 +10,7 @@ from datetime import datetime
 import psycopg
 
 from .config import get_settings
-from .repository import EmailAlreadyRegistered, User
+from .repository import EmailAlreadyRegistered, StoredUserData, User
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
@@ -109,6 +109,16 @@ class PostgresUserRepository:
         """
         with psycopg.connect(self._dsn) as conn:
             return [r[0] for r in conn.execute(sql, (email, since, email, limit)).fetchall()]
+
+    def list_confirmed_users(self) -> list[StoredUserData]:
+        sql = """
+            SELECT email, created_at, pii_enc, phi_enc, credit_enc
+            FROM users
+            WHERE otp_confirmed = TRUE
+            ORDER BY created_at
+        """
+        with psycopg.connect(self._dsn) as conn:
+            return [StoredUserData(*row) for row in conn.execute(sql).fetchall()]
 
 
 if __name__ == "__main__":
