@@ -242,3 +242,18 @@ class ExportTest(AuthServiceBase):
         self.assertNotIn("argon2", data)
         self.assertNotIn(secret, data)
         self.assertNotIn(PASSWORD, data)
+
+
+class AccountTest(AuthServiceBase):
+    def test_user_sees_own_decrypted_data(self):
+        self.register_active()
+        uid = self.repo.users[EMAIL]["id"]
+        data = self.svc.get_account(uid)
+        self.assertEqual(data["email"], EMAIL)
+        self.assertEqual(data["document_id"], "1020304050")
+        self.assertEqual(data["medical_conditions"], "Alergia a la penicilina")
+
+    def test_pending_or_unknown_account_returns_none(self):
+        self.svc.register(make_form())
+        self.assertIsNone(self.svc.get_account(self.repo.users[EMAIL]["id"]))
+        self.assertIsNone(self.svc.get_account(999))
