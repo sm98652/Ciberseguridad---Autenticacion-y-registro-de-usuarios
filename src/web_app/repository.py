@@ -61,6 +61,9 @@ class UserRepository(Protocol):
     def recent_failures(self, email: str, since: datetime, limit: int) -> list[datetime]:
         """Fallos posteriores a `since` y al último éxito, del más nuevo al más antiguo."""
 
+    def get_stored_data(self, user_id: int) -> StoredUserData | None:
+        """Datos cifrados de una cuenta confirmada, o None si no existe o está pendiente."""
+
     def list_confirmed_users(self) -> list[StoredUserData]:
         """Usuarios con el OTP confirmado, ordenados por fecha de registro.
         No incluye el hash de la contraseña ni el secreto OTP."""
