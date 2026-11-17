@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 
-from web_app.repository import EmailAlreadyRegistered, User
+from web_app.repository import EmailAlreadyRegistered, StoredUserData, User
 
 
 class FakeRepo:
@@ -25,6 +25,7 @@ class FakeRepo:
         self.users[email] = dict(
             id=uid, email=email, password_hash=password_hash, otp_secret_enc=otp_secret_enc,
             otp_confirmed=False, otp_last_step=0, pii_enc=pii_enc, phi_enc=phi_enc, credit_enc=credit_enc,
+            created_at=existing["created_at"] if existing else self._now(),
         )
         return uid
 
@@ -62,3 +63,12 @@ class FakeRepo:
         fails = [a["at"] for a in mine if not a["success"] and a["at"] > since
                  and (last_ok is None or a["at"] > last_ok)]
         return sorted(fails, reverse=True)[:limit]
+
+    def list_confirmed_users(self):
+        confirmed = sorted(
+            (u for u in self.users.values() if u["otp_confirmed"]), key=lambda u: u["created_at"]
+        )
+        return [
+            StoredUserData(u["email"], u["created_at"], u["pii_enc"], u["phi_enc"], u["credit_enc"])
+            for u in confirmed
+        ]
