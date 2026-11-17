@@ -10,8 +10,6 @@ from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
 from cryptography.fernet import Fernet, MultiFernet
 
-
-
 MIN_LENGTH = 12
 MAX_LENGTH = 128  # evita enviar contraseñas enormes para agotar CPU al hashear
 
@@ -71,8 +69,6 @@ def needs_rehash(password_hash: str) -> bool:
 # respuesta tarde lo mismo y no se pueda enumerar correos por tiempo de respuesta.
 DUMMY_HASH = _hasher.hash(secrets.token_urlsafe(24))
 DUMMY_OTP_SECRET = "JBSWY3DPEHPK3PXP"
-
-
 
 
 class FieldCipher:
