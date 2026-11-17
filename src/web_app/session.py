@@ -45,11 +45,27 @@ def logout() -> None:
     st.session_state.pop(_KEY, None)
 
 
+def is_admin(user: dict | None) -> bool:
+    """Un usuario es administrador si su correo está en ADMIN_EMAILS (.env)."""
+    if not user:
+        return False
+    return user["email"].strip().lower() in get_settings().admin_emails
+
+
 def require_login() -> dict:
     """Llamar al inicio de cada página protegida."""
     user = current_user()
     if user is None:
         st.warning("Debes iniciar sesión para ver esta página.")
-        st.page_link("all_pages/2_auth_page.py", label="Ir a iniciar sesión", icon="🔐")
+        st.page_link("all_pages/2_auth_page.py", label="Ir a iniciar sesión", icon=":material/login:")
+        st.stop()
+    return user
+
+
+def require_admin() -> dict:
+    """Como require_login, pero además exige que el usuario sea administrador."""
+    user = require_login()
+    if not is_admin(user):
+        st.error("No tienes permisos para ver esta sección.")
         st.stop()
     return user
