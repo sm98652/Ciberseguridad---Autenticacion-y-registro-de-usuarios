@@ -30,7 +30,7 @@ h1, h2, h3, h4 { font-weight: 300 !important; letter-spacing: 0.02em; }
     font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase;
 }
 
-[data-testid="stForm"], .st-key-enroll-card, .st-key-admin-card, .st-key-page-card {
+[data-testid="stForm"], .st-key-enroll-card, .st-key-admin-card, .st-key-page-card, .st-key-account-card {
     background: rgba(255, 255, 255, 0.07);
     border: 1px solid rgba(255, 255, 255, 0.45) !important;
     backdrop-filter: blur(6px);
@@ -102,6 +102,12 @@ h1, h2, h3, h4 { font-weight: 300 !important; letter-spacing: 0.02em; }
     letter-spacing: 0.25em; text-transform: uppercase; font-size: 0.78rem; padding: 0.75rem 0;
 }
 .st-key-cta button:hover { background: #3D251C; color: #FFFFFF; }
+.kv {
+    display: flex; justify-content: space-between; gap: 1rem;
+    padding: 0.45rem 0; border-bottom: 1px solid rgba(255,255,255,0.18); font-size: 0.92rem;
+}
+.kv span:first-child { color: rgba(255,255,255,0.65); }
+.kv span:last-child { color: #FFFFFF; text-align: right; word-break: break-word; }
 .footer {
     text-align: center; color: rgba(255,255,255,0.6); font-size: 0.72rem;
     letter-spacing: 0.08em; margin-top: 2.5rem;
