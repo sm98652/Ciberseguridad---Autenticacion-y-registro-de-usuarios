@@ -30,7 +30,7 @@ h1, h2, h3, h4 { font-weight: 300 !important; letter-spacing: 0.02em; }
     font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase;
 }
 
-[data-testid="stForm"], .st-key-enroll-card, .st-key-admin-card {
+[data-testid="stForm"], .st-key-enroll-card, .st-key-admin-card, .st-key-page-card {
     background: rgba(255, 255, 255, 0.07);
     border: 1px solid rgba(255, 255, 255, 0.45) !important;
     backdrop-filter: blur(6px);
